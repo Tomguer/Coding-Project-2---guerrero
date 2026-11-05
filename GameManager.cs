@@ -22,8 +22,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject endPanel;
     [SerializeField] TMP_Text endText;
     [SerializeField] string titleScene = "Title";
+    [SerializeField] AudioSource sfx;
+    [SerializeField] AudioClip coinSound;
+    [SerializeField] AudioClip winSound;
+    [SerializeField] AudioClip loseSound;
     int coins;
-  
+
+    private void Awake()
+    {
+        Instance = this;
+    }
     void Start()
     {
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
@@ -33,7 +41,8 @@ public class GameManager : MonoBehaviour
     {
         coins++;
         Debug.Log("Coins:" + coins);
-        if (coins >= coinsToWin) state = State.Won;
+        PlaySound(coinSound);
+        if (coins >= coinsToWin) Win();
     }
     public void LoseLife()
     {
@@ -45,11 +54,13 @@ public class GameManager : MonoBehaviour
     void Win()
     {
         state = State.Won;
+        PlaySound(winSound);
         ShowEnd("You win");
     }
     void Lose()
     {
         state = State.Lost;
+        PlaySound(loseSound);
         ShowEnd("You lose");
     }
 
@@ -72,7 +83,7 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(titleScene);
     }
-    void StopPlayer()
+    public void StopPlayer()
     {
         if (playerInput != null) playerInput.enabled = false;
         if (input != null)
@@ -85,4 +96,16 @@ public class GameManager : MonoBehaviour
         UnityEngine.Cursor.visible = true;
     }
 
+    public void ResumePlayer ()
+    {
+        if (playerInput != null) playerInput.enabled = true;
+        if (input != null) input.cursorLocked = true;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.visible = false;
     }
+    void PlaySound(AudioClip clip) 
+    {
+        if (sfx != null && clip != null) sfx.PlayOneShot(clip);
+    }
+
+}
